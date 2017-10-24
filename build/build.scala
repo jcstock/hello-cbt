@@ -23,27 +23,26 @@ class Build(val context: Context) extends SbtLayoutMain with GenerateBuildInfo w
   def version = "0.1"
   def groupId = "org.johnstocker"
 
-  override def defaultScalaVersion = "2.12.3"
+  // override def defaultScalaVersion = "2.12.3"
 
   override def buildInfo = super.buildInfo.copy(
     s"""
     def artifactId   = "$artifactId"
     def groupId      = "$groupId"
     def version      = "$version"
-    def scalaVersion = "$scalaVersion"
+    def scalaVersion = "$defaultScalaVersion" // "$scalaVersion"
     """
   )
 
   override def dependencies = (
-    super.dependencies ++ // don't forget super.dependencies here for scala-library, etc.
     Seq(
-      // source dependency
-      // DirectoryDependency( projectDirectory ++ "/subProject" )
+       DirectoryDependency( projectDirectory ++ "/src/main" ),
+       DirectoryDependency( projectDirectory ++ "/src/test" )
     ) ++
-    // pick resolvers explicitly for individual dependencies (and their transitive dependencies)
     Resolver( mavenCentral, sonatypeReleases ).bind(
       MavenDependency("org.scala-lang", "scala-compiler", scalaVersion),
       ScalaDependency("com.github.scopt", "scopt", "3.7.0")
     )
-  )
+  ) ++ super.dependencies
+
 }
